@@ -8,13 +8,13 @@
 // 11 直接返回元组的所有值，其结果会自动取联合类型
 type TupleToUnion<T extends readonly (number | string)[]> = T[number]
 
+type Arr = ['1', '2', '3']
+type Test = TupleToUnion<Arr> // expected to be '1' | '2' | '3'
+
 // 10 同理直接返回T[number]同时作为 KV 即可
 type TupleToObject<T extends readonly (number | string)[]> = {
     [P in T[number]]: P
 }
-
-type Arr = ['1', '2', '3']
-type Test = TupleToUnion<Arr> // expected to be '1' | '2' | '3'
 
 const tuple = ['tesla', 'model 3', 'model X', 'model Y'] as const
 type result = TupleToObject<typeof tuple> // expected { tesla: 'tesla', 'model 3': 'model 3', 'model X': 'model X', 'model Y': 'model Y'}
