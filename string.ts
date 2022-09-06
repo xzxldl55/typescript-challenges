@@ -6,6 +6,9 @@
  * 110. Capitalize：实现 Capitalize<T> 它将字符串的第一个字母转换为大写，其余字母保持原样。
  * 116. Replace：实现 Replace<S, From, To> 将字符串 S 中的第一个子字符串 From 替换为 To 。
  * 119. ReplaceAll：实现 ReplaceAll<S, From, To> 将一个字符串 S 中的所有子字符串 From 替换为 To。
+ * xxx. ConverStrToArray：字符串转数组
+ * 298. Length of String：计算字符串长度
+ * 612. KebabCase：驼峰换短杠 FooBarBaz -> foo-bar-baz
  */
 
 // 106
@@ -47,3 +50,22 @@ type ReplaceAll<S extends string, F extends string, T extends string> = F extend
     );
 
 type replacedAll = ReplaceAll<'t y p e s', ' ', ''> // 期望是 'types'
+
+// xxx
+type ConverStrToArray<S extends string> = S extends `${infer F}${infer O}` ?
+        [F, ...ConverStrToArray<O>] :
+        [];
+
+// 298
+type StringLen<S extends string> = ConverStrToArray<S>['length']
+
+type TestStringLen = StringLen<'1234'>;
+
+// 612
+type KebabCase<S extends string> = S extends `${infer F}${infer R}` ?
+    R extends Uncapitalize<R> ?
+        `${Lowercase<F>}${KebabCase<R>}` :
+        `${F}-${KebabCase<R>}` :
+    S;
+
+type testKebabCase = KebabCase<'OnClickBody'>; // on-click-body

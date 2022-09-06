@@ -10,6 +10,8 @@
  * 3057. Push：在类型系统里实现通用的 Array.push 。
  * 3060：Unshift：实现类型版本的 Array.unshift。
  * 296. Permutation：实现联合类型的全排列，将联合类型转换成所有可能的全排列数组的联合类型。
+ * 459. Flatten：在这个挑战中，你需要写一个接受数组的类型，并且返回扁平化的数组类型。
+ * 949. AnyOf：在类型系统中实现类似于 Python 中 any 函数。类型接收一个数组，如果数组中任一个元素为真，则返回 true，否则返回 false。如果数组为空，返回 false。
  */
 
 // 14
@@ -52,9 +54,29 @@ type ResultPush = Push<[1, 2], '3'> // [1, 2, '3']
 // 3060
 type Unshift<T extends any[], V extends any> = [V, ...T];
 
-type ResultUnshift = Unshift<[1, 2], 0> // [0, 1, 2,]
+type ResultUnshift = Unshift<[1, 2], 0>; // [0, 1, 2,]
 
 // 296
-// type Permutation<T> = 
+// 官方文档中，介绍了一种操作，叫 Distributive conditional types
+// 简单来说，传入给T extends U中的T如果是一个联合类型A | B | C，则这个表达式会被展开成
+// (A extends U ? X : Y) | (B extends U ? X : Y) | (C extends U ? X : Y)
+// [U] extends [never] 而不是 U extends never 因为 U 是联合类型 条件类型会走分配得到的是一个联合类型  不符合期望
+type Permutation<T, U = T> = [U] extends [never] ? [] : (T extends U ? [T, ...Permutation<Exclude<U, T>>] : []);
 
-// type perm = Permutation<'A' | 'B' | 'C'>; // ['A', 'B', 'C'] | ['A', 'C', 'B'] | ['B', 'A', 'C'] | ['B', 'C', 'A'] | ['C', 'A', 'B'] | ['C', 'B', 'A']
+type perm = Permutation<'A' | 'B' | 'C'>; // ['A', 'B', 'C'] | ['A', 'C', 'B'] | ['B', 'A', 'C'] | ['B', 'C', 'A'] | ['C', 'A', 'B'] | ['C', 'B', 'A']
+
+// 459
+type Flatten<A extends any[]> = A extends [infer F, ...(infer O)] ?
+    [
+        ...(F extends any[] ? Flatten<F> : [F]),
+        ...Flatten<O>
+    ] :
+    [];
+
+type flatten = Flatten<[[1], [2], [3, [4]], [[[5]]]]> // [1, 2, 3, 4, 5]
+
+// 949
+type AnyOf<T extends any[]> = T[number] extends (0 | false | '' | null | undefined | [] | { [i in string]: never }) ? false : true
+
+type Sample1 = AnyOf<[1, '', false, [], {}]> // expected to be true.
+type Sample2 = AnyOf<[0, '', false, [], {}]> // expected to be false.

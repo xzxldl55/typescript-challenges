@@ -11,6 +11,10 @@
  * 12. Chainable：你需要提供两个函数 option(key, value) 和 get()。在 option 中你需要使用提供的 key 和 value 扩展当前的对象类型，通过 get 获取最终结果。
  * 62. Lookup：有时，您可能希望根据某个属性在联合类型中查找类型，在此挑战中，我们想通过在联合类型Cat | Dog中搜索公共type字段来获取相应的类型。换句话说，在以下示例中，我们期望LookUp<Dog | Cat, 'dog'>获得Dog，LookUp<Dog | Cat, 'cat'>获得Cat。
  * 191. AppendArgument：实现一个泛型 AppendArgument<Fn, A>，对于给定的函数类型 Fn，以及一个任意类型 A，返回一个新的函数 G。G 拥有 Fn 的所有参数并在末尾追加类型为 A 的参数。
+ * 1042. IsNever：实现一个类型，能够判别传入内容是否为never
+ * 1097 ?. IsUnion：实现一个类型，能够判断传入内容是否是一个 Union 联合类型
+ * 9999. IsKnown：实现一个类型，能够判断传入内容是否为一个 Unknown
+ * 99991. IsAny：实现一个类型，能够判断传入内容是否为一个 Any
  */
 
 // 4
@@ -116,3 +120,50 @@ type AppendArgument<F extends (...args: any[]) => any, A extends any> = F extend
 type Fn = (a: number, b: string) => number
 type ResultAppendArgument = AppendArgument<Fn, boolean> 
 // 期望是 (a: number, b: string, x: boolean) => number
+
+// 1042
+type IsNever<T> = [T] extends [never] ? true : false; // 直接 T extends never ? true : false; 仅会返回 never 故利用 [] 来包裹
+
+type neverA = IsNever<never>  // expected to be true
+type neverB = IsNever<undefined> // expected to be false
+type neverC = IsNever<null> // expected to be false
+type neverD = IsNever<[]> // expected to be false
+type neverE = IsNever<number> // expected to be false
+
+// 1097
+type IsUnion<U, C = U> = IsNever<U> extends true ?
+    false :
+    U extends C ?
+        ([C] extends [U] ? false : true) :
+        false;
+
+type unionCase1 = IsUnion<string>  // false
+type unionCase2 = IsUnion<string|number>  // true
+type unionCase3 = IsUnion<[string|number]>  // false
+
+// 99999
+// 用[]排除never
+type IsUnknown<T> = ([T] extends [void]
+    ? false
+    : (
+        [void] extends [T] ? true : false
+    )) extends true ? true : false;
+
+// 99991
+type IsAny<T> = (any extends T ? true : false) extends true
+    ? IsUnknown<T> extends true ? false : true
+    : false
+
+type AAt1 = IsAny<undefined>
+type AAt2 = IsAny<null>
+type AAt3 = IsAny<number>
+type AAt4 = IsAny<string>
+type AAt5 = IsAny<boolean>
+type AAt6 = IsAny<true>
+type AAt7 = IsAny<symbol>
+type AAt8 = IsAny<string []>
+type AAt9 = IsAny<any>
+type AAt10 = IsAny<void>
+type AAt11 = IsAny<never>
+type AAt12 = IsAny<unknown>
+
