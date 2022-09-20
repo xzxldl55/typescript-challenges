@@ -128,7 +128,7 @@ type neverA = IsNever<never>  // expected to be true
 type neverB = IsNever<undefined> // expected to be false
 type neverC = IsNever<null> // expected to be false
 type neverD = IsNever<[]> // expected to be false
-type neverE = IsNever<number> // expected to be false
+type neverE = IsNever<any> // expected to be false
 
 // 1097
 type IsUnion<U, C = U> = IsNever<U> extends true ?
@@ -142,11 +142,10 @@ type unionCase2 = IsUnion<string|number>  // true
 type unionCase3 = IsUnion<[string|number]>  // false
 
 // 99999
-// 用[]排除never
 type IsUnknown<T> = ([T] extends [void]
-    ? false
+    ? false // 排除any/void/never 仅 [never | void | any] extends [void] 能进入true 分支
     : (
-        [void] extends [T] ? true : false
+        void extends T ? true : false // void extends void | unknown ==> true 分支，这里排除非 unknown 的类型
     )) extends true ? true : false;
 
 // 99991
@@ -154,16 +153,16 @@ type IsAny<T> = (any extends T ? true : false) extends true
     ? IsUnknown<T> extends true ? false : true
     : false
 
-type AAt1 = IsAny<undefined>
-type AAt2 = IsAny<null>
-type AAt3 = IsAny<number>
-type AAt4 = IsAny<string>
-type AAt5 = IsAny<boolean>
-type AAt6 = IsAny<true>
-type AAt7 = IsAny<symbol>
-type AAt8 = IsAny<string []>
-type AAt9 = IsAny<any>
-type AAt10 = IsAny<void>
-type AAt11 = IsAny<never>
-type AAt12 = IsAny<unknown>
-
+type AAt = IsUnknown<{ [key: string]: any }>
+type AAt1 = IsUnknown<undefined>
+type AAt2 = IsUnknown<null>
+type AAt3 = IsUnknown<number>
+type AAt4 = IsUnknown<string>
+type AAt5 = IsUnknown<boolean>
+type AAt6 = IsUnknown<true>
+type AAt7 = IsUnknown<symbol>
+type AAt8 = IsUnknown<string []>
+type AAt9 = IsUnknown<any>
+type AAt10 = IsUnknown<void>
+type AAt11 = IsUnknown<never>
+type AAt12 = IsUnknown<unknown>

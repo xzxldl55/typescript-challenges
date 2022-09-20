@@ -9,6 +9,7 @@
  * xxx. ConverStrToArray：字符串转数组
  * 298. Length of String：计算字符串长度
  * 612. KebabCase：驼峰换短杠 FooBarBaz -> foo-bar-baz
+ * 1978. Percentage Parser：百分比解析器，根据规则 /^(\+|\-)?(\d*)?(\%)?$/ 来匹配类型T，得到结果类型 [sign, number, unit]
  */
 
 // 106
@@ -69,3 +70,17 @@ type KebabCase<S extends string> = S extends `${infer F}${infer R}` ?
     S;
 
 type testKebabCase = KebabCase<'OnClickBody'>; // on-click-body
+
+// 1978 --> 分而治之，拆分成要求的三份进行匹配
+type PercentageParser<T extends string> = [
+    GetFirstChar<T>,
+    GetMiddleStr<T>,
+    GetLastChar<T>
+]
+type GetFirstChar<T extends string> = T extends `${infer F}${string}`
+    ? F extends '+' | '-' ? F : ''
+    : '';
+type GetLastChar<T extends string> = T extends `${string}%` ? '%' : '';
+type GetMiddleStr<T extends string> = T extends `${GetFirstChar<T>}${infer M}${GetLastChar<T>}` ? M : '';
+
+type testPercentageParser = PercentageParser<'-98%'>

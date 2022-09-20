@@ -5,7 +5,7 @@
  * 599. Merge：合并两个对象，第二个类型会覆盖第一个的同键值
  * 645. Diff： 获取两个接口类型中的差值属性。
  * 1130. ReplaceKeys：在类型中替换联合类型的key，如果存在则按要求替换，否则设置该键值为never
- * 1367. RemoveIndexSignature：
+ * 1367. RemoveIndexSignature：移除类型中的 indexSignature 属性（可转化为字符串键值的）
  */
 
 // 527 属性键进行联合
@@ -63,8 +63,8 @@ const diff2: diffRes2 = {
 // 1130
 type ReplaceKeys<T, K, D> = {
     [P in keyof T]: P extends K ? // 如果为待替换 key，进入下一阶段
-        (P extends keyof D ? D[P] : never) : // 检查替换内容中是否存在该 Key，存在则替换，否则为never
-        T[P] // 非待替换 key，直接返回
+    (P extends keyof D ? D[P] : never) : // 检查替换内容中是否存在该 Key，存在则替换，否则为never
+    T[P] // 非待替换 key，直接返回
 };
 
 type NodeA = {
@@ -86,3 +86,14 @@ type Nodes = NodeA | NodeB | NodeC
 type ReplacedNodes = ReplaceKeys<Nodes, 'name' | 'flag', { name: number, flag: string }> // {type: 'A', name: number, flag: string} | {type: 'B', id: number, flag: string} | {type: 'C', name: number, flag: string} // would replace name from string to number, replace flag from number to string.
 type ReplacedNotExistKeys = ReplaceKeys<Nodes, 'name', { aa: number }> // {type: 'A', name: never, flag: number} | NodeB | {type: 'C', name: never, flag: number} // would replace name to never
 
+// 1367
+type RemoveIndexSignature<T> = {
+    [P in keyof T as P extends `${infer S}` ? P : never]: T[P]
+};
+
+type aRISType = {
+    [key: string]: any;
+    foo(): void;
+}
+
+type testRemoveIndexSignature = RemoveIndexSignature<aRISType>  // expected { foo(): void }
