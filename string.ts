@@ -10,6 +10,7 @@
  * 298. Length of String：计算字符串长度
  * 612. KebabCase：驼峰换短杠 FooBarBaz -> foo-bar-baz
  * 1978. Percentage Parser：百分比解析器，根据规则 /^(\+|\-)?(\d*)?(\%)?$/ 来匹配类型T，得到结果类型 [sign, number, unit]
+ * 2070. DropChar：从字符中剔除指定字符
  */
 
 // 106
@@ -84,3 +85,10 @@ type GetLastChar<T extends string> = T extends `${string}%` ? '%' : '';
 type GetMiddleStr<T extends string> = T extends `${GetFirstChar<T>}${infer M}${GetLastChar<T>}` ? M : '';
 
 type testPercentageParser = PercentageParser<'-98%'>
+
+// 2070
+type DropChar<T extends string, R extends string> = T extends `${infer First}${infer REST}`
+    ? First extends R ? DropChar<REST, R> : `${First}${DropChar<REST, R>}`
+    : T;
+
+type testDropChar = DropChar<' b u t t o n ', ' '>;
