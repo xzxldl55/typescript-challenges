@@ -4,8 +4,6 @@
  * 4. Pick：实现内置的Pick<T, K>工具
  * 43. Exclude：实现内置的Exclude <T, U>类型，但不能直接使用它本身，从联合类型T中排除U的类型成员，来构造一个新的类型。
  * 268. If：实现一个 IF 类型，它接收一个条件类型 C ，一个判断为真时的返回类型 T ，以及一个判断为假时的返回类型 F。 C 只能是 true 或者 false， T 和 F 可以是任意类型。
- * 3312. Parameters：实现内置的 Parameters 类型，而不是直接使用它，可获得函数的参数类型列表
- * 2. ReturnType：返回函数的返回值类型
  * 1000. Equal：实现Equal<T, K>返回二者是否相等
  * 3. Omit：不使用 Omit 实现 TypeScript 的 Omit<T, K> 泛型，Omit 会创建一个省略 K 中字段的 T 对象。
  * 12. Chainable：你需要提供两个函数 option(key, value) 和 get()。在 option 中你需要使用提供的 key 和 value 扩展当前的对象类型，通过 get 获取最终结果。
@@ -42,31 +40,6 @@ type ResultMyExclude = MyExclude<"a" | "b" | "c", "a">; // 'b' | 'c'
 type If<C, T, F> = C extends true ? T : F;
 
 type A = If<true, "a", "b">; // expected to be 'a'
-
-// 3312
-type MyParameters<T extends (...args: any) => any> = T extends (
-  ...args: infer R
-) => any
-  ? R
-  : never;
-
-const foo = (arg1: string, arg2: number) => {
-  if (arg1 === "1") {
-    return 1;
-  } else {
-    return 2;
-  }
-};
-type FunctionParamsType = MyParameters<typeof foo>; // [arg1: string, arg2: number]
-
-// 2
-type MyReturnType<T extends (...args: any) => any> = T extends (
-  ...args: any
-) => infer R
-  ? R
-  : never;
-
-type a = MyReturnType<typeof foo>; // 1 | 2
 
 // 1000
 type Equal<T, U> = T extends U ? (U extends T ? true : false) : false;

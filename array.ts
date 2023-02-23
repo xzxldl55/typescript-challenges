@@ -14,6 +14,7 @@
  * 949. AnyOf: 在类型系统中实现类似于 Python 中 any 函数。类型接收一个数组，如果数组中任一个元素为真，则返回 true，否则返回 false。如果数组为空，返回 false。
  * 3062. Shift: 实现Array.prototype.shift，取出第一项
  * 3192: Reverse: 实现类型版本的数组反转 Array.reverse
+ * 3243. FlattenDepth： 实现 FlattenDepth<A1, Time> 递归展开数组 time 次（默认1）eg: FlattenDepth<[1, 2, [3, 4], [[[5]]]], 2> // [1, 2, 3, 4, [5]].
  */
 
 // 14
@@ -83,6 +84,23 @@ type Flatten<A extends any[]> = A extends [infer F, ...infer O]
 
 type flatten = Flatten<[[1], [2], [3, [4]], [[[5]]]]>; // [1, 2, 3, 4, 5]
 
+// 3243
+// 拆解一次数组嵌套
+type FlattenOnce<T extends any[]> = T extends [infer F, ...infer R]
+  ? [...(F extends any[] ? F : [F]), ...FlattenOnce<R>]
+  : [];
+type FlattenDepth<
+  T extends any[],
+  Time extends number = 1,
+  CountArr extends any[] = [] // 计数器数组
+> = T extends any[] 
+  ? CountArr['length'] extends Time // 利用计数器来计算当前拆解次数
+    ? T // 满足拆解次数后直接返回被拆解完毕的 T
+    : FlattenDepth<FlattenOnce<T>, Time, [...CountArr, any]> // 否则递归拆解，每次递归拆解CountArr长度 +1 
+  : never; // T 非数组直接返回never
+
+type testFlattenDepth = FlattenDepth<[1, 2, [3, 4], [[[5]]]], 2>;
+
 // 949
 type Falsy =
   | 0
@@ -102,6 +120,8 @@ type Sample1 = AnyOf<[1, "", [1], { a: 1 }]>; // expected to be true.
 type Sample2 = AnyOf<[0, "", false, [], {}]>; // expected to be false.
 
 // 3192
-type Reverse<T extends any[]> = T extends [...infer F, infer R] ? [R, ...Reverse<F>] : [];
+type Reverse<T extends any[]> = T extends [...infer F, infer R]
+  ? [R, ...Reverse<F>]
+  : [];
 
-type testReverse = Reverse<['1', '2', '3']>;
+type testReverse = Reverse<["1", "2", "3"]>;

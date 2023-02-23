@@ -13,6 +13,7 @@
  * 2070. DropChar: 从字符中剔除指定字符
  * 2688. StartsWith: 实现StartsWith<T, U>,接收两个string类型参数,然后判断T是否以U开头,根据结果返回true或false
  * 2693. EndsWith: 实现EndsWith<T, U>,接收两个string类型参数,然后判断T是否以U结尾,根据结果返回true或false
+ * 3326. BEM: 实现BEM<B, E, M>这一流行的CSS命名方式，其中E，M为数组，最终生成名称会是 B__E--M 的所有组合形式 BEM<'btn', ['primary', 'warning'], ['large'] = 'btn__primary--large' | 'btn__warning--large';
  */
 
 // 106
@@ -120,8 +121,31 @@ type testStartsWith = StartsWith<"abc", "ab">;
 type testStartsWith1 = StartsWith<"abc", "abcd">;
 
 // 2693
-type EndsWith<T extends string, U extends string> = T extends `${infer F}${U}` ? true : false;
+type EndsWith<T extends string, U extends string> = T extends `${infer F}${U}`
+  ? true
+  : false;
 
 type testEndsWith1 = EndsWith<"abc", "bc">; // expected to be true
 type testEndsWith2 = EndsWith<"abc", "abc">; // expected to be true
 type testEndsWith3 = EndsWith<"abc", "d">; // expected to be false
+
+// 3323
+type BEM<
+  B extends string,
+  E extends string[],
+  M extends string[]
+> = `${B}${E extends []
+  ? ""
+  
+  : {
+      [EK in keyof E]: `__${E[EK]}`;
+    }[number] // 联合类型，将被上面的 extends 规则变成循环进行匹配
+  }${
+      M extends []
+        ? ""
+        : {
+          [MK in keyof M]: `--${M[MK]}`;
+        }[number] // 同理，对 M 进行循环
+  }`;
+
+type testBEM = BEM<"btn", ["1", "2", "3"], ["a", "c"]>;
