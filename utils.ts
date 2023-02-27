@@ -19,27 +19,27 @@
 type MyPick<T, K extends keyof T> = { [P in K]: T[P] };
 
 type TodoPreview = MyPick<
-  {
-    title: string;
-    description: string;
-    completed: boolean;
-  },
-  "title" | "completed"
+    {
+        title: string;
+        description: string;
+        completed: boolean;
+    },
+    'title' | 'completed'
 >;
 const todo: TodoPreview = {
-  title: "Clean room",
-  completed: false,
+    title: 'Clean room',
+    completed: false,
 };
 
 // 23
 type MyExclude<T, U> = T extends U ? never : T;
 
-type ResultMyExclude = MyExclude<"a" | "b" | "c", "a">; // 'b' | 'c'
+type ResultMyExclude = MyExclude<'a' | 'b' | 'c', 'a'>; // 'b' | 'c'
 
 // 268
 type If<C, T, F> = C extends true ? T : F;
 
-type A = If<true, "a", "b">; // expected to be 'a'
+type A = If<true, 'a', 'b'>; // expected to be 'a'
 
 // 1000
 type Equal<T, U> = T extends U ? (U extends T ? true : false) : false;
@@ -48,33 +48,33 @@ type testEqual = Equal<1, 2>;
 
 // 3
 type MyOmit<T, K extends keyof T> = {
-  [P in MyExclude<keyof T, K>]: T[P];
+    [P in MyExclude<keyof T, K>]: T[P];
 };
 
 type TestMyOmit = MyOmit<
-  {
-    title: string;
-    description: string;
-    completed: boolean;
-  },
-  "description" | "title"
+    {
+        title: string;
+        description: string;
+        completed: boolean;
+    },
+    'description' | 'title'
 >; // { complected: boolean }
 
 // 12
 type Chainable<T = {}> = {
-  option<K extends string, V extends any>(
-    key: K,
-    value: V
-  ): Chainable<T & Record<K, V>>; // 返回Chainable，传入类型为原 类型T + KV键值对
-  get(): T;
+    option<K extends string, V extends any>(
+        key: K,
+        value: V
+    ): Chainable<T & Record<K, V>>; // 返回Chainable，传入类型为原 类型T + KV键值对
+    get(): T;
 };
 
 declare const config: Chainable;
 const result = config
-  .option("foo", 123)
-  .option("name", "type-challenges")
-  .option("bar", { value: "Hello World" })
-  .get();
+    .option('foo', 123)
+    .option('name', 'type-challenges')
+    .option('bar', { value: 'Hello World' })
+    .get();
 // 期望 result 自动推断的类型是：
 // interface Result {
 //   foo: number
@@ -88,20 +88,20 @@ const result = config
 type Lookup<T, K> = T extends { type: K } ? T : never; // 直接将类型 K 放到公共属性中，判读 T 是否继承自它即可
 
 interface Cat {
-  type: "cat";
-  breeds: "Abyssinian" | "Shorthair" | "Curl" | "Bengal";
+    type: 'cat';
+    breeds: 'Abyssinian' | 'Shorthair' | 'Curl' | 'Bengal';
 }
 interface Dog {
-  type: "dog";
-  breeds: "Hound" | "Brittany" | "Bulldog" | "Boxer";
-  color: "brown" | "white" | "black";
+    type: 'dog';
+    breeds: 'Hound' | 'Brittany' | 'Bulldog' | 'Boxer';
+    color: 'brown' | 'white' | 'black';
 }
-type MyDog = Lookup<Cat | Dog, "dog">; // expected to be `Dog`
+type MyDog = Lookup<Cat | Dog, 'dog'>; // expected to be `Dog`
 
 // 191
 type AppendArgument<
-  F extends (...args: any[]) => any,
-  A extends any
+    F extends (...args: any[]) => any,
+    A extends any
 > = F extends (...args: infer R) => infer X ? (...args: [...R, A]) => X : never;
 
 type Fn = (a: number, b: string) => number;
@@ -119,12 +119,12 @@ type neverE = IsNever<any>; // expected to be false
 
 // 1097
 type IsUnion<U, C = U> = IsNever<U> extends true
-  ? false
-  : U extends C
-  ? [C] extends [U]
     ? false
-    : true
-  : false;
+    : U extends C
+    ? [C] extends [U]
+        ? false
+        : true
+    : false;
 
 type unionCase1 = IsUnion<string>; // false
 type unionCase2 = IsUnion<string | number>; // true
@@ -132,21 +132,21 @@ type unionCase3 = IsUnion<[string | number]>; // false
 
 // 99999
 type IsUnknown<T> = (
-  [T] extends [void]
-    ? false // 排除any/void/never 仅 [never | void | any] extends [void] 能进入true 分支
-    : void extends T
+    [T] extends [void]
+        ? false // 排除any/void/never 仅 [never | void | any] extends [void] 能进入true 分支
+        : void extends T
+        ? true
+        : false
+) extends true // void extends void | unknown ==> true 分支，这里排除非 unknown 的类型
     ? true
-    : false // void extends void | unknown ==> true 分支，这里排除非 unknown 的类型
-) extends true
-  ? true
-  : false;
+    : false;
 
 // 99991
 type IsAny<T> = (any extends T ? true : false) extends true
-  ? IsUnknown<T> extends true
-    ? false
-    : true
-  : false;
+    ? IsUnknown<T> extends true
+        ? false
+        : true
+    : false;
 
 type AAt = IsUnknown<{ [key: string]: any }>;
 type AAt1 = IsUnknown<undefined>;
@@ -161,4 +161,3 @@ type AAt9 = IsUnknown<any>;
 type AAt10 = IsUnknown<void>;
 type AAt11 = IsUnknown<never>;
 type AAt12 = IsUnknown<unknown>;
-

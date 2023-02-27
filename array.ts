@@ -20,7 +20,7 @@
 // 14
 type First<T extends any[]> = T[0];
 
-type arr1 = ["a", "b", "c"];
+type arr1 = ['a', 'b', 'c'];
 type head1 = First<arr1>; // expected to be 'a'
 
 // 15
@@ -34,9 +34,9 @@ type Pop<T extends any[]> = T extends [...infer X, any] ? [...X] : never;
 type re1 = Pop<arr1>;
 
 // 18
-type Length<T extends any[]> = T["length"];
+type Length<T extends any[]> = T['length'];
 
-type tesla = ["tesla", "model 3", "model X", "model Y"];
+type tesla = ['tesla', 'model 3', 'model X', 'model Y'];
 type teslaLength = Length<tesla>; // expected 4
 
 // 533
@@ -47,12 +47,12 @@ type Result = Concat<[1], [2]>; // expected to be [1, 2]
 // 898
 type Includes<T extends any[], V> = V extends T[number] ? true : false;
 
-type isPillarMen = Includes<["Kars", "Esidisi", "Wamuu", "Santana"], "Dio">; // expected to be `false`
+type isPillarMen = Includes<['Kars', 'Esidisi', 'Wamuu', 'Santana'], 'Dio'>; // expected to be `false`
 
 // 3057
 type Push<T extends any[], V extends any> = [...T, V];
 
-type ResultPush = Push<[1, 2], "3">; // [1, 2, '3']
+type ResultPush = Push<[1, 2], '3'>; // [1, 2, '3']
 
 // 3060
 type Unshift<T extends any[], V extends any> = [V, ...T];
@@ -70,58 +70,58 @@ type testShift = Shift<[3, 2, 1]>;
 // (A extends U ? X : Y) | (B extends U ? X : Y) | (C extends U ? X : Y)
 // [U] extends [never] 而不是 U extends never 因为 U 是联合类型 条件类型会走分配得到的是一个联合类型  不符合期望
 type Permutation<T, U = T> = [U] extends [never]
-  ? []
-  : T extends U
-  ? [T, ...Permutation<Exclude<U, T>>]
-  : [];
+    ? []
+    : T extends U
+    ? [T, ...Permutation<Exclude<U, T>>]
+    : [];
 
-type perm = Permutation<"A" | "B" | "C">; // ['A', 'B', 'C'] | ['A', 'C', 'B'] | ['B', 'A', 'C'] | ['B', 'C', 'A'] | ['C', 'A', 'B'] | ['C', 'B', 'A']
+type perm = Permutation<'A' | 'B' | 'C'>; // ['A', 'B', 'C'] | ['A', 'C', 'B'] | ['B', 'A', 'C'] | ['B', 'C', 'A'] | ['C', 'A', 'B'] | ['C', 'B', 'A']
 
 // 459
 type Flatten<A extends any[]> = A extends [infer F, ...infer O]
-  ? [...(F extends any[] ? Flatten<F> : [F]), ...Flatten<O>]
-  : [];
+    ? [...(F extends any[] ? Flatten<F> : [F]), ...Flatten<O>]
+    : [];
 
 type flatten = Flatten<[[1], [2], [3, [4]], [[[5]]]]>; // [1, 2, 3, 4, 5]
 
 // 3243
 // 拆解一次数组嵌套
 type FlattenOnce<T extends any[]> = T extends [infer F, ...infer R]
-  ? [...(F extends any[] ? F : [F]), ...FlattenOnce<R>]
-  : [];
+    ? [...(F extends any[] ? F : [F]), ...FlattenOnce<R>]
+    : [];
 type FlattenDepth<
-  T extends any[],
-  Time extends number = 1,
-  CountArr extends any[] = [] // 计数器数组
-> = T extends any[] 
-  ? CountArr['length'] extends Time // 利用计数器来计算当前拆解次数
-    ? T // 满足拆解次数后直接返回被拆解完毕的 T
-    : FlattenDepth<FlattenOnce<T>, Time, [...CountArr, any]> // 否则递归拆解，每次递归拆解CountArr长度 +1 
-  : never; // T 非数组直接返回never
+    T extends any[],
+    Time extends number = 1,
+    CountArr extends any[] = [] // 计数器数组
+> = T extends any[]
+    ? CountArr['length'] extends Time // 利用计数器来计算当前拆解次数
+        ? T // 满足拆解次数后直接返回被拆解完毕的 T
+        : FlattenDepth<FlattenOnce<T>, Time, [...CountArr, any]> // 否则递归拆解，每次递归拆解CountArr长度 +1
+    : never; // T 非数组直接返回never
 
 type testFlattenDepth = FlattenDepth<[1, 2, [3, 4], [[[5]]]], 2>;
 
 // 949
 type Falsy =
-  | 0
-  | ""
-  | undefined
-  | null
-  | { [K in PropertyKey]: never }
-  | []
-  | false;
+    | 0
+    | ''
+    | undefined
+    | null
+    | { [K in PropertyKey]: never }
+    | []
+    | false;
 type AnyOf<T extends any[]> = T extends [infer F, ...infer R] // 遍历
-  ? F extends Falsy
-    ? AnyOf<R>
-    : true // 出现某个不符合 Falsy则返回true，否则递归继续遍历
-  : false;
+    ? F extends Falsy
+        ? AnyOf<R>
+        : true // 出现某个不符合 Falsy则返回true，否则递归继续遍历
+    : false;
 
-type Sample1 = AnyOf<[1, "", [1], { a: 1 }]>; // expected to be true.
-type Sample2 = AnyOf<[0, "", false, [], {}]>; // expected to be false.
+type Sample1 = AnyOf<[1, '', [1], { a: 1 }]>; // expected to be true.
+type Sample2 = AnyOf<[0, '', false, [], {}]>; // expected to be false.
 
 // 3192
 type Reverse<T extends any[]> = T extends [...infer F, infer R]
-  ? [R, ...Reverse<F>]
-  : [];
+    ? [R, ...Reverse<F>]
+    : [];
 
-type testReverse = Reverse<["1", "2", "3"]>;
+type testReverse = Reverse<['1', '2', '3']>;

@@ -4,53 +4,53 @@
  * 9. 实现一个通用的DeepReadonly<T>，它将对象的每个参数及其子对象递归地设为只读。
  */
 type MyReadonly<T> = {
-    readonly [P in keyof T]: T[P]
-}
+    readonly [P in keyof T]: T[P];
+};
 
 type MyReadonly2<T extends object, K extends keyof T = keyof T> = {
-    readonly [P in K]: T[K]
+    readonly [P in K]: T[K];
 } & {
-    [U in keyof T as (U extends K ? never : U)]:T[U]
-}
+    [U in keyof T as U extends K ? never : U]: T[U];
+};
 
 type DeepReadonly<T> = {
-    readonly [P in keyof T]: T[P] extends Function ? 
-        T[P] : 
-        T[P] extends object ?
-            DeepReadonly<T[P]> : 
-            T[P]
-}
+    readonly [P in keyof T]: T[P] extends Function
+        ? T[P]
+        : T[P] extends object
+        ? DeepReadonly<T[P]>
+        : T[P];
+};
 
 interface Todo {
-    title: string
-    description: string
+    title: string;
+    description: string;
 }
 const todo: MyReadonly<Todo> = {
-    title: "Hey",
-    description: "foobar"
-}
-todo.title = "Hello" // Error: cannot reassign a readonly property
-todo.description = "barFoo" // Error: cannot reassign a readonly property
+    title: 'Hey',
+    description: 'foobar',
+};
+todo.title = 'Hello'; // Error: cannot reassign a readonly property
+todo.description = 'barFoo'; // Error: cannot reassign a readonly property
 
 const todo2: MyReadonly2<Todo, 'title'> = {
-    title: "Hey",
-    description: "foobar",
-}
-todo2.title = "Hello" // Error: cannot reassign a readonly property
-todo2.description = "barFoo" // √ can update
+    title: 'Hey',
+    description: 'foobar',
+};
+todo2.title = 'Hello'; // Error: cannot reassign a readonly property
+todo2.description = 'barFoo'; // √ can update
 
-type X = { 
-    x: { 
-        a: 1
-        b: 'hi'
-    }
-    y: 'hey'
-}
-type Expected = { 
-    readonly x: { 
-        readonly a: 1
-        readonly b: 'hi'
-    }
-    readonly y: 'hey' 
-}
-type Todo3 = DeepReadonly<X> // should be same as `Expected`
+type X = {
+    x: {
+        a: 1;
+        b: 'hi';
+    };
+    y: 'hey';
+};
+type Expected = {
+    readonly x: {
+        readonly a: 1;
+        readonly b: 'hi';
+    };
+    readonly y: 'hey';
+};
+type Todo3 = DeepReadonly<X>; // should be same as `Expected`

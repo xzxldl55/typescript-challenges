@@ -9,15 +9,17 @@
 
 // 529
 type Absolute<N extends string | number | bigint> =
-  `${N}` extends `${infer S}${infer R}` ? `${S extends "-" ? "" : S}${R}` : "";
+    `${N}` extends `${infer S}${infer R}`
+        ? `${S extends '-' ? '' : S}${R}`
+        : '';
 
 type testAbsolute = Absolute<-1515>;
 
 // 531
 type StringToUnion<S extends string> = S extends `${infer F}${infer R}` // 字面量 + infer定义，递归
-  ? [F, ...StringToUnion<R>]
-  : [];
-type testStringToUnion = StringToUnion<"123">; // expected to be "1" | "2" | "3"
+    ? [F, ...StringToUnion<R>]
+    : [];
+type testStringToUnion = StringToUnion<'123'>; // expected to be "1" | "2" | "3"
 
 // 2257
 // type MinusOne<T extends number> =
@@ -32,5 +34,5 @@ export type StringToNumber<
         ? Res['length']
         : StringToNumber<S, [...Res, 0]> // 递归调用，不断增加Res数组长度，直到满足条件
     : never;
-  
-type TestStringToNumber = StringToNumber<"19" | "20" | '31'>;
+
+type TestStringToNumber = StringToNumber<'19' | '20' | '31'>;

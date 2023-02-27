@@ -17,135 +17,131 @@
  */
 
 // 106
-type Blank = " " | "\n" | "\t";
+type Blank = ' ' | '\n' | '\t';
 type TrimLeft<T extends string> = T extends `${Blank}${infer R}`
-  ? TrimLeft<R>
-  : T; // 1. 用模板字符串模拟继承类型；2. 递归一个个去除空白字符。
+    ? TrimLeft<R>
+    : T; // 1. 用模板字符串模拟继承类型；2. 递归一个个去除空白字符。
 
-type trimedLeft = TrimLeft<"     Hello World  ">; // 应推导出 'Hello World  '
+type trimedLeft = TrimLeft<'     Hello World  '>; // 应推导出 'Hello World  '
 
 // 108
 type Trim<T extends string> = T extends `${infer R}${Blank}` // 先消消乐右边
-  ? Trim<R>
-  : TrimLeft<T>; // 在消消乐左边
+    ? Trim<R>
+    : TrimLeft<T>; // 在消消乐左边
 
-type trimed = Trim<"     Hello World    ">;
+type trimed = Trim<'     Hello World    '>;
 
 // 110
 type MyCapitalize<T extends string> = T extends `${infer C}${infer R}`
-  ? `${Uppercase<C>}${R}`
-  : T; // 使用内建类型 Uppercase 将首字母大写
+    ? `${Uppercase<C>}${R}`
+    : T; // 使用内建类型 Uppercase 将首字母大写
 
-type capitalized = MyCapitalize<"hello world">; // expected to be 'Hello world'
+type capitalized = MyCapitalize<'hello world'>; // expected to be 'Hello world'
 
 // 116
 type Replace<
-  S extends string,
-  F extends string,
-  T extends string
-> = F extends "" // From为空时，返回原字符串
-  ? S
-  : S extends `${infer X}${F}${infer R}` // 否则利用infer定义变量替换掉From
-  ? `${X}${T}${R}`
-  : S;
+    S extends string,
+    F extends string,
+    T extends string
+> = F extends '' // From为空时，返回原字符串
+    ? S
+    : S extends `${infer X}${F}${infer R}` // 否则利用infer定义变量替换掉From
+    ? `${X}${T}${R}`
+    : S;
 
-type replaced = Replace<"types are fun!", "fun", "awesome">; // 期望是 'types are awesome!'
+type replaced = Replace<'types are fun!', 'fun', 'awesome'>; // 期望是 'types are awesome!'
 
 // 119
 type ReplaceAll<
-  S extends string,
-  F extends string,
-  T extends string
-> = F extends ""
-  ? S
-  : S extends `${infer X}${F}${infer R}` // 与Replace逻辑一致
-  ? `${ReplaceAll<X, F, T>}${T}${ReplaceAll<R, F, T>}` // 这里需要对前后拼接字符 递归 替换，以达成replaceAll的效果
-  : S;
+    S extends string,
+    F extends string,
+    T extends string
+> = F extends ''
+    ? S
+    : S extends `${infer X}${F}${infer R}` // 与Replace逻辑一致
+    ? `${ReplaceAll<X, F, T>}${T}${ReplaceAll<R, F, T>}` // 这里需要对前后拼接字符 递归 替换，以达成replaceAll的效果
+    : S;
 
-type replacedAll = ReplaceAll<"t y p e s", " ", "">; // 期望是 'types'
+type replacedAll = ReplaceAll<'t y p e s', ' ', ''>; // 期望是 'types'
 
 // xxx
 type ConverStrToArray<S extends string> = S extends `${infer F}${infer O}`
-  ? [F, ...ConverStrToArray<O>]
-  : [];
+    ? [F, ...ConverStrToArray<O>]
+    : [];
 
 // 298
-type StringLen<S extends string> = ConverStrToArray<S>["length"];
+type StringLen<S extends string> = ConverStrToArray<S>['length'];
 
-type TestStringLen = StringLen<"1234">;
+type TestStringLen = StringLen<'1234'>;
 
 // 612
 type KebabCase<S extends string> = S extends `${infer F}${infer R}`
-  ? R extends Uncapitalize<R>
-    ? `${Lowercase<F>}${KebabCase<R>}`
-    : `${F}-${KebabCase<R>}`
-  : S;
+    ? R extends Uncapitalize<R>
+        ? `${Lowercase<F>}${KebabCase<R>}`
+        : `${F}-${KebabCase<R>}`
+    : S;
 
-type testKebabCase = KebabCase<"OnClickBody">; // on-click-body
+type testKebabCase = KebabCase<'OnClickBody'>; // on-click-body
 
 // 1978 --> 分而治之，拆分成要求的三份进行匹配
 type PercentageParser<T extends string> = [
-  GetFirstChar<T>,
-  GetMiddleStr<T>,
-  GetLastChar<T>
+    GetFirstChar<T>,
+    GetMiddleStr<T>,
+    GetLastChar<T>
 ];
 type GetFirstChar<T extends string> = T extends `${infer F}${string}`
-  ? F extends "+" | "-"
-    ? F
-    : ""
-  : "";
-type GetLastChar<T extends string> = T extends `${string}%` ? "%" : "";
+    ? F extends '+' | '-'
+        ? F
+        : ''
+    : '';
+type GetLastChar<T extends string> = T extends `${string}%` ? '%' : '';
 type GetMiddleStr<T extends string> =
-  T extends `${GetFirstChar<T>}${infer M}${GetLastChar<T>}` ? M : "";
+    T extends `${GetFirstChar<T>}${infer M}${GetLastChar<T>}` ? M : '';
 
-type testPercentageParser = PercentageParser<"-98%">;
+type testPercentageParser = PercentageParser<'-98%'>;
 
 // 2070
 type DropChar<
-  T extends string,
-  R extends string
+    T extends string,
+    R extends string
 > = T extends `${infer First}${infer REST}`
-  ? First extends R
-    ? DropChar<REST, R>
-    : `${First}${DropChar<REST, R>}`
-  : T;
+    ? First extends R
+        ? DropChar<REST, R>
+        : `${First}${DropChar<REST, R>}`
+    : T;
 
-type testDropChar = DropChar<" b u t t o n ", " ">;
+type testDropChar = DropChar<' b u t t o n ', ' '>;
 
 // 2688
 type StartsWith<T extends string, U extends string> = T extends `${U}${infer R}`
-  ? true
-  : false;
+    ? true
+    : false;
 
-type testStartsWith = StartsWith<"abc", "ab">;
-type testStartsWith1 = StartsWith<"abc", "abcd">;
+type testStartsWith = StartsWith<'abc', 'ab'>;
+type testStartsWith1 = StartsWith<'abc', 'abcd'>;
 
 // 2693
 type EndsWith<T extends string, U extends string> = T extends `${infer F}${U}`
-  ? true
-  : false;
+    ? true
+    : false;
 
-type testEndsWith1 = EndsWith<"abc", "bc">; // expected to be true
-type testEndsWith2 = EndsWith<"abc", "abc">; // expected to be true
-type testEndsWith3 = EndsWith<"abc", "d">; // expected to be false
+type testEndsWith1 = EndsWith<'abc', 'bc'>; // expected to be true
+type testEndsWith2 = EndsWith<'abc', 'abc'>; // expected to be true
+type testEndsWith3 = EndsWith<'abc', 'd'>; // expected to be false
 
 // 3323
-type BEM<
-  B extends string,
-  E extends string[],
-  M extends string[]
-> = `${B}${E extends []
-  ? ""
-  
-  : {
-      [EK in keyof E]: `__${E[EK]}`;
-    }[number] // 联合类型，将被上面的 extends 规则变成循环进行匹配
-  }${
-      M extends []
-        ? ""
+type BEM<B extends string, E extends string[], M extends string[]> = `${B}${
+    E extends []
+        ? ''
         : {
-          [MK in keyof M]: `--${M[MK]}`;
-        }[number] // 同理，对 M 进行循环
-  }`;
+              [EK in keyof E]: `__${E[EK]}`;
+          }[number] // 联合类型，将被上面的 extends 规则变成循环进行匹配
+}${
+    M extends []
+        ? ''
+        : {
+              [MK in keyof M]: `--${M[MK]}`;
+          }[number] // 同理，对 M 进行循环
+}`;
 
-type testBEM = BEM<"btn", ["1", "2", "3"], ["a", "c"]>;
+type testBEM = BEM<'btn', ['1', '2', '3'], ['a', 'c']>;

@@ -7,39 +7,39 @@
  */
 
 const foo = (arg1: string, arg2: number) => {
-  if (arg1 === "1") {
-    return 1;
-  } else {
-    return 2;
-  }
+    if (arg1 === '1') {
+        return 1;
+    } else {
+        return 2;
+    }
 };
 
 // 2
 type MyReturnType<T extends (...args: any) => any> = T extends (
-  ...args: any
+    ...args: any
 ) => infer R
-  ? R
-  : never;
+    ? R
+    : never;
 
 type a = MyReturnType<typeof foo>; // 1 | 2
 
 // 3312
 type MyParameters<T extends (...args: any) => any> = T extends (
-  ...args: infer R
+    ...args: infer R
 ) => any
-  ? R
-  : never;
+    ? R
+    : never;
 
 type FunctionParamsType = MyParameters<typeof foo>; // [arg1: string, arg2: number]
 
 // 3196
 type ReverseParams<T extends any[]> = T extends [infer F, ...infer R]
-  ? [...ReverseParams<R>, F]
-  : [];
+    ? [...ReverseParams<R>, F]
+    : [];
 type FlipArguments<T extends (...args: any) => any> = T extends (
-  ...args: infer P
+    ...args: infer P
 ) => infer R
-  ? (...args: ReverseParams<P>) => R
-  : never;
+    ? (...args: ReverseParams<P>) => R
+    : never;
 
 type testFilpArguments = FlipArguments<typeof foo>;
