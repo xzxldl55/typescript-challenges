@@ -69,6 +69,8 @@ type ConverStrToArray<S extends string> = S extends `${infer F}${infer O}`
     ? [F, ...ConverStrToArray<O>]
     : [];
 
+type TestConverStrToArray = ConverStrToArray<'1234'>;
+
 // 298
 type StringLen<S extends string> = ConverStrToArray<S>['length'];
 
